@@ -1,5 +1,9 @@
 /**
- * To use this macro, paste monster data from a pdf, including the name of the monster, to the end of the "Tactics" section
+ * To use this macro, paste monster data from a pdf, for the core book:
+ * including the name of the monster, to the end of the "Tactics" section
+ * 
+ * For the monster codex, copy from Manners to end of tactics, and paste to notepad. At the beginning of the text, add the name of the npc/monster, then paste into the textfield
+ * 
  */
 
 (()=>{
