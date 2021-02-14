@@ -82,7 +82,7 @@ async function extractAllData(npcData)
     console.log("Shadow["+extractData(expectedData,shadowPattern)+"]");    
     setProperty(newValues, "data.bio.shadow", extractData(expectedData,shadowPattern));
     
-        // If nomatch == thouroughly corrupt
+    // If nomatch == thouroughly corrupt
     let corruptionPattern = /\(corruption: ([0-9]+)\)/;
     console.log("Permanent Corruption["+extractData(expectedData,corruptionPattern)+"]");   
     let corr = extractData(expectedData,corruptionPattern);
@@ -95,8 +95,6 @@ async function extractAllData(npcData)
     setProperty(newValues, "data.bio.tactics", extractData(expectedData,tacticsPattern));
 
     let actor = await Actor.create(newValues);
-    
-    console.log("Actor pre-items is "+JSON.stringify(actor)); 
 
     let traitsPattern = /Traits (.+) Accurate [0-9]/;
     console.log("Traits["+extractData(expectedData,traitsPattern)+"]");
