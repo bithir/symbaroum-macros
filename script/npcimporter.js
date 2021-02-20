@@ -31,8 +31,8 @@
 
 async function extractSpecialItems(actorItems, abilitilist, abilityPattern)
 {
+    let message = "";
     if( abilitilist !== null) {
-
         await abilitilist.forEach(async element => { 
             let tmpdata = element.trim().match(abilityPattern);
             if( tmpdata != null && tmpdata.length == 3)
@@ -74,18 +74,24 @@ async function extractSpecialItems(actorItems, abilitilist, abilityPattern)
                     // console.log("Final ability "+JSON.stringify(ability));
                     actorItems.push(ability);
                 }
-
+                else 
+                {
+                    message += `${element} not added - add manually <br/>`;
+                }
             }
             else 
             {
                 console.log("element["+element+"] not found - add manually");           
             }
         });
+
     }    
+    return message;    
 }
 
 async function extractAllData(npcData)
 {
+    let additionalInfo = "";
 
     let extractData = function(inputData, inputPattern) {
         let tmp = inputData.match(inputPattern);
@@ -172,20 +178,24 @@ async function extractAllData(npcData)
     let actorItems = [];
     // Normal abilities
     // Medicus (master), 
-    await extractSpecialItems(actorItems, abilitilist, abilityPattern);
+    additionalInfo += await extractSpecialItems(actorItems, abilitilist, abilityPattern);
     // Mystical Power
     let mysicalPowerPattern = /Mystical Power \(([^,]+), (.*)\)/
     // Mystical Power (Bend Will, master)
-    await extractSpecialItems(actorItems, abilitilist, mysicalPowerPattern);
+    additionalInfo += await extractSpecialItems(actorItems, abilitilist, mysicalPowerPattern);
 
     let traitsPattern = /Traits (.+) Accurate [0-9]/;
     // console.log("Traits["+extractData(expectedData,traitsPattern)+"]");
     let traitstlist = extractData(expectedData,traitsPattern).match(singleAbilityPattern);
     console.log("traitslist ="+JSON.stringify(traitstlist));
-    await extractSpecialItems(actorItems, traitstlist, abilityPattern);
-
-
+    additionalInfo += await extractSpecialItems(actorItems, traitstlist, abilityPattern);
 
     let updateObj = await actor.createOwnedItem(actorItems);
     // console.log("updateObj "+JSON.stringify(updateObj));
+    let message = `Created ${actor.name}<br/>${additionalInfo}`;
+    ChatMessage.create({
+        speaker: ChatMessage.getSpeaker({alias: "NPC Importer Macro"}),
+        content: message
+    });
+
 }
