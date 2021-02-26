@@ -9,7 +9,7 @@
 (()=>{
     let dialog_content = `  
     <div class="form-group">
-      <label for="npctext">Pase NPC data</label>
+      <label for="npctext">Paste NPC data</label>
       <input name="npctext" type="text">
     </div>`;
   
@@ -107,7 +107,7 @@ async function extractAllData(npcData)
     // npcData = "Necromage Race Spirit Resistance Challenging Traits Alternative damage (III), Spirit form (III), Terrify (II) Accurate 10 (0), Cunning 9 (+1), Discreet 11 (−1), Persuasive 5 (+5), Quick 13 (−3), Resolute 15 (−5), Strong 7 (+3), Vigilant 10 (0) Abilities Mystical power (Bend will, adept) Weapons Wraith claws 5, ignores armor, Accurate damages Resolute Armor None, only mystical powers and magical weapons are harmful, only with half damage Defense −3 Toughness 10 Pain Threshold — Equipment None Shadow Dark gray, like thunderclouds in a cold night sky (thoroughly corrupt) Tactics: The necromage calls on its victims by bending their will, follows up by making them terrified and finishes them off with its claws when they are helpless.";
     // npcData = "Primal Blight Beast Race Abomination Resistance Mighty Traits Acidic Blood (III), Armored (III), Corrupting Attack (III), Natural Weapon (III), Regeneration (III), Robust (III) Discreet 5 (+5), Quick 11 (−1), Cunning 9 (+1), Strong 18 (−8), Accurate 13 (−3), Vigilant 10 (0), Resolute 10 (0), Persuasive 7 (+3) Abilities Berserker (master), Exceptionally Strong (master), Iron Fist (master), Natural Warrior (master) Weapons Claws 20 (long), or two attacks Strong against the same target with damage 18 and 14, +1D8 in tem- porary corruption. Armor Blight Hardened Flesh 10, regen- erates 4 Toughness/turn Defense +3 Toughness 18 Pain Threshold 9 Shadow The deepest black, a light-con- suming stain on the midnight sky (thoroughly corrupt) Tactics: None. Its hatred towards all things living drives it to act without tactical concern – all that matters is destruction.";
     // npcData = "Cryptwalker Race Spirit Resistance Strong Traits Gravely cold (III), Manifestation (III), Spirit form (III) Accurate 5 (+5), Cunning 10 (0), Discreet 7 (+3), Persuasive 10 (0), Quick 11 (−1), Resolute 13 (−3), Strong 15 (−5), Vigilant 9 (+1) Abilities Iron Fist (master), Twin Attack (master) Weapons 2 swords 7/6 (balanced), two Strong attacks against the same target Armor None, only mystical powers and magical weapons are harmful, only with half damage Defense −3 (two weapons) Toughness 15 Pain Threshold — Equipment Two wraith blades (quality: Balanced) Shadow Like a clear night sky, with faint light that does nothing but make the dark seem blacker (thoroughly corrupt) Tactics: The cryptwalker assumes that the ene- my will have a hard time damaging it, until proven otherwise. Either way it uses its gravely cold power to paralyze enemies, then finishes them off with the swords.";
-    let expectedData = npcData.replaceAll("- ","");
+    let expectedData = npcData; // .replaceAll("- ","");
 
     let namePattern = /^(.+?) (Race|Manner)/;
     let newValues = {
