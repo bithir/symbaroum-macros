@@ -2,7 +2,14 @@
  * To use this macro, paste monster data from a pdf, for the core book:
  * including the name of the monster, to the end of the "Tactics" section
  * 
- * For the monster codex, copy from Manners to end of tactics, and paste to notepad. At the beginning of the text, add the name of the npc/monster, then paste into the textfield
+ * For the monster codex, manually type in the name, then copy from Manners to end of tactics and paste.
+ * Warning: the tilted character sheet can cause issues, depending on your pdf viewer, you might need to do those manually.
+ * 
+ * WARNING: Sometimes Foundry do not like the worl and do not add all abilities/traits/mystical abilities to monsters.
+ *  
+ * Make sure you have all abilities, traits and powers in the "Items" in Foundry.
+ * 
+ * Note, if using the electron version of Foundry, you might need to 
  * 
  */
 
@@ -35,12 +42,16 @@ async function extractSpecialItems(actorItems, abilitilist, abilityPattern)
     if( abilitilist !== null) {
         await abilitilist.forEach(async element => { 
             let tmpdata = element.trim().match(abilityPattern);
+            console.log("tmpdata = "+tmpdata);
             if( tmpdata != null && tmpdata.length == 3)
             {
                 let higherLevel = false;
-                let ability = game.items.filter(element => element.name.toLowerCase() === tmpdata[1].trim().toLowerCase());
+                let ability = game.items.filter(element => element.name.trim().toLowerCase() === tmpdata[1].trim().toLowerCase());
+                console.log("tmpdata[2]"+tmpdata[2]+":");
                 if(ability.length > 0 )
                 {
+                    console.log("ability="+JSON.stringify(ability));
+
                     ability = duplicate(ability[0].data);
                     let abilityAction = "";
 
@@ -72,6 +83,7 @@ async function extractSpecialItems(actorItems, abilitilist, abilityPattern)
                         setProperty(ability, "data.novice.action", "A");
                     }
                     // console.log("Final ability "+JSON.stringify(ability));
+                    console.log("Added ability "+ability.name)
                     actorItems.push(ability);
                 }
                 else 
@@ -79,8 +91,9 @@ async function extractSpecialItems(actorItems, abilitilist, abilityPattern)
                     message += `${element} not added - add manually <br/>`;
                 }
             }
-            else 
+            else if( element.trim() !== "")
             {
+                // message += `${element} not added - not found under Items - add manually <br/>`;
                 console.log("element["+element+"] not found - add manually");           
             }
         });
@@ -107,7 +120,8 @@ async function extractAllData(npcData)
     // npcData = "Necromage Race Spirit Resistance Challenging Traits Alternative damage (III), Spirit form (III), Terrify (II) Accurate 10 (0), Cunning 9 (+1), Discreet 11 (−1), Persuasive 5 (+5), Quick 13 (−3), Resolute 15 (−5), Strong 7 (+3), Vigilant 10 (0) Abilities Mystical power (Bend will, adept) Weapons Wraith claws 5, ignores armor, Accurate damages Resolute Armor None, only mystical powers and magical weapons are harmful, only with half damage Defense −3 Toughness 10 Pain Threshold — Equipment None Shadow Dark gray, like thunderclouds in a cold night sky (thoroughly corrupt) Tactics: The necromage calls on its victims by bending their will, follows up by making them terrified and finishes them off with its claws when they are helpless.";
     // npcData = "Primal Blight Beast Race Abomination Resistance Mighty Traits Acidic Blood (III), Armored (III), Corrupting Attack (III), Natural Weapon (III), Regeneration (III), Robust (III) Discreet 5 (+5), Quick 11 (−1), Cunning 9 (+1), Strong 18 (−8), Accurate 13 (−3), Vigilant 10 (0), Resolute 10 (0), Persuasive 7 (+3) Abilities Berserker (master), Exceptionally Strong (master), Iron Fist (master), Natural Warrior (master) Weapons Claws 20 (long), or two attacks Strong against the same target with damage 18 and 14, +1D8 in tem- porary corruption. Armor Blight Hardened Flesh 10, regen- erates 4 Toughness/turn Defense +3 Toughness 18 Pain Threshold 9 Shadow The deepest black, a light-con- suming stain on the midnight sky (thoroughly corrupt) Tactics: None. Its hatred towards all things living drives it to act without tactical concern – all that matters is destruction.";
     // npcData = "Cryptwalker Race Spirit Resistance Strong Traits Gravely cold (III), Manifestation (III), Spirit form (III) Accurate 5 (+5), Cunning 10 (0), Discreet 7 (+3), Persuasive 10 (0), Quick 11 (−1), Resolute 13 (−3), Strong 15 (−5), Vigilant 9 (+1) Abilities Iron Fist (master), Twin Attack (master) Weapons 2 swords 7/6 (balanced), two Strong attacks against the same target Armor None, only mystical powers and magical weapons are harmful, only with half damage Defense −3 (two weapons) Toughness 15 Pain Threshold — Equipment Two wraith blades (quality: Balanced) Shadow Like a clear night sky, with faint light that does nothing but make the dark seem blacker (thoroughly corrupt) Tactics: The cryptwalker assumes that the ene- my will have a hard time damaging it, until proven otherwise. Either way it uses its gravely cold power to paralyze enemies, then finishes them off with the swords.";
-    let expectedData = npcData; // .replaceAll("- ","");
+    // npcData = "Beamon Race Predator (beast) Resistance Challenging Traits Armored (II), Natural Weapon (II), Robust (II) Accurate 10 (0), Cunning 13 (−3), Discreet 7 (+3), Persuasive 5 (+5), Quick 10 (0), Resolute 9 (+1), Strong 15 (−5), Vigilant 11 (−1) Abilities Iron Fist (master), Natural Warrior (adept) Weapons Paws 12/7, two attacks at the Strong same target Armor Thick fur 6 Defense +3 Toughness 15 Pain Threshold 8 Shadow Brown bordering on black, like newly oiled hides (corruption: 0) Tactics: The Beamon relies on its strength and toughness, but is not stupid. If hopelessly outnumbered or facing stronger than expected resistance it will flee.";
+    let expectedData = npcData.replace(/- /g,"");
 
     let namePattern = /^(.+?) (Race|Manner)/;
     let newValues = {
@@ -171,8 +185,8 @@ async function extractAllData(npcData)
     let actor = await Actor.create(newValues);
 
     let abilitiesPattern = /Abilities (.*) Weapons /;
-    let singleAbilityPattern = /([^,^\)]+?)\),?/g;
-    let abilityPattern = /([^\(]+)\((.+)\)/;
+    let singleAbilityPattern = /([^,^\)]+?\))?/g;
+    let abilityPattern = / ?([^\(]+)\((.+)\)/;
     let allAbilities = extractData(expectedData,abilitiesPattern);
     let abilitilist = allAbilities.match(singleAbilityPattern);
     let actorItems = [];
@@ -185,10 +199,12 @@ async function extractAllData(npcData)
     additionalInfo += await extractSpecialItems(actorItems, abilitilist, mysicalPowerPattern);
 
     let traitsPattern = /Traits (.+) Accurate [0-9]/;
-    // console.log("Traits["+extractData(expectedData,traitsPattern)+"]");
+    console.log("Traits["+extractData(expectedData,traitsPattern)+"]");
     let traitstlist = extractData(expectedData,traitsPattern).match(singleAbilityPattern);
     console.log("traitslist ="+JSON.stringify(traitstlist));
     additionalInfo += await extractSpecialItems(actorItems, traitstlist, abilityPattern);
+
+    console.log("actorItems:"+JSON.stringify(actorItems));
 
     let updateObj = await actor.createOwnedItem(actorItems);
     // console.log("updateObj "+JSON.stringify(updateObj));
