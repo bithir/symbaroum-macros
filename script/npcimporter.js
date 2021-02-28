@@ -5,7 +5,7 @@
  * For the monster codex, manually type in the name, then copy from Manners to end of tactics and paste.
  * Warning: the tilted character sheet can cause issues, depending on your pdf viewer, you might need to do those manually.
  * 
- * WARNING: Sometimes Foundry do not like the worl and do not add all abilities/traits/mystical abilities to monsters.
+ * WARNING: If you have multiple items that matches the name of abilities, traits and mystical powers, they might be found instead.
  *  
  * Make sure you have all abilities, traits and powers in the "Items" in Foundry.
  * 
