@@ -36,7 +36,7 @@
   
 })();
 
-async function extractSpecialItems(actorItems, abilitilist, abilityPattern)
+async function extractSpecialItems(actorItems, type, abilitilist, abilityPattern)
 {
     let message = "";
     if( abilitilist !== null) {
@@ -46,11 +46,11 @@ async function extractSpecialItems(actorItems, abilitilist, abilityPattern)
             if( tmpdata != null && tmpdata.length == 3)
             {
                 let higherLevel = false;
-                let ability = game.items.filter(element => element.name.trim().toLowerCase() === tmpdata[1].trim().toLowerCase());
+                let ability = game.items.filter(element => element.name.trim().toLowerCase() === tmpdata[1].trim().toLowerCase() && element.type === type);
                 console.log("tmpdata[2]"+tmpdata[2]+":");
                 if(ability.length > 0 )
                 {
-                    console.log("ability="+JSON.stringify(ability));
+                    // console.log("ability="+JSON.stringify(ability));
 
                     ability = duplicate(ability[0].data);
                     let abilityAction = "";
@@ -188,23 +188,30 @@ async function extractAllData(npcData)
     let singleAbilityPattern = /([^,^\)]+?\))?/g;
     let abilityPattern = / ?([^\(]+)\((.+)\)/;
     let allAbilities = extractData(expectedData,abilitiesPattern);
+    console.log("allAbilities:"+allAbilities);
     let abilitilist = allAbilities.match(singleAbilityPattern);
     let actorItems = [];
+    console.log("abilitylist:"+abilitilist);
+
     // Normal abilities
     // Medicus (master), 
-    additionalInfo += await extractSpecialItems(actorItems, abilitilist, abilityPattern);
+    additionalInfo += await extractSpecialItems(actorItems, "ability", abilitilist, abilityPattern);
     // Mystical Power
-    let mysicalPowerPattern = /Mystical Power \(([^,]+), (.*)\)/
+    // let mysticalPowerPattern = /Mystical [Pp]ower \(([^,]+), ([^\)]*)\)/g;
+    let singleMysticalPowerPattern = /Mystical [Pp]ower \(([^\)]*)\)/g;
+    abilitilist = allAbilities.match(singleMysticalPowerPattern);
+    let mysticalPowerPattern = /\(([^,]+), (.*)\)/
+    console.log("abilitylist[mp]:"+JSON.stringify(abilitilist));
     // Mystical Power (Bend Will, master)
-    additionalInfo += await extractSpecialItems(actorItems, abilitilist, mysicalPowerPattern);
+    additionalInfo += await extractSpecialItems(actorItems, "mysticalPower", abilitilist, mysticalPowerPattern);
 
     let traitsPattern = /Traits (.+) Accurate [0-9]/;
     console.log("Traits["+extractData(expectedData,traitsPattern)+"]");
     let traitstlist = extractData(expectedData,traitsPattern).match(singleAbilityPattern);
-    console.log("traitslist ="+JSON.stringify(traitstlist));
-    additionalInfo += await extractSpecialItems(actorItems, traitstlist, abilityPattern);
+    // console.log("traitslist ="+JSON.stringify(traitstlist));
+    additionalInfo += await extractSpecialItems(actorItems, "trait", traitstlist, abilityPattern);
 
-    console.log("actorItems:"+JSON.stringify(actorItems));
+    // console.log("actorItems:"+JSON.stringify(actorItems));
 
     let updateObj = await actor.createOwnedItem(actorItems);
     // console.log("updateObj "+JSON.stringify(updateObj));
