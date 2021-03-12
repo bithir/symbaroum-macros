@@ -9,8 +9,6 @@
  *  
  * Make sure you have all abilities, traits and powers in the "Items" in Foundry.
  * 
- * Note, if using the electron version of Foundry, you might need to 
- * 
  */
 
 (()=>{
