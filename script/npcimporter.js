@@ -112,13 +112,6 @@ async function extractAllData(npcData)
         }
         return "nomatch";
     };
-    // npcData = "Night Swarmers, swarm Manner Chattering, swirling Race Abomination Resistance Challenging Traits Corrupting Attack (II), Fleet- footed, Night Perception, Piercing Attack (II), Regeneration (III), Swarm (II), Wings (II) Accurate 11 (–1), Cunning 5 (+5), Discreet 10 (0), Persuasive 7 (+3), Quick 15 (–5), Resolute 9 (+1), Strong 13 (–3), Vigilant 10 (0) Abilities Natural Warrior (adept) Weapons Bite 0 (penetrating: 5), two Accurate attacks at the same target, 1D6 temporary corruption Armor Half damage according to Swarm II, regenerates 4 Toughness per turn except fire damage. Defense –5 Toughness 13 Pain Threshold 7 Shadow Flickering black, like swir- ling soot flakes in starlight (thoroughly corrupt) Tactics: The swarm has nothing in mind besides gorging until it is full, and it does not quit until the target is blight born or leaves its territory.";
-    // npcData = "Spring Elf Race Elf Resistance Weak Traits Long-lived Accurate 10 (0), Cunning 10 (0), Discreet 15 (−5), Persuasive 9 (+1), Quick 13 (−3), Resolute 7 (+3), Strong 5 (+5), Vigilant 11 (−1) Abilities None Weapons Dagger 3 (short), Bow 4 Accurate Armor None Defense −3 Toughness 10 Pain Threshold 3 Equipment Nothing of value Shadow Bright green, like the leaves on a baby birch (corruption: 0) Tactics: The spring elves keep their distance and attack the enemy with their bows, or else try to lure victim into varying kinds of traps or ambushes.";
-    // npcData = "Autumn Elf Race Elf Resistance Strong Traits Long-lived Accurate 9 (+1), Cunning 13 (−3), Discreet 10 (0), Persuasive 11 (−1), Quick 5 (+5), Resolute 15 (−5), Strong 7 (+3), Vigilant 10 (0) Abilities Loremaster (master), Medicus (master), Mystical Power (Bend Will, master), Mystical Power (Larvae Boil, master), Ritualist (master) Weapons Sword 4 Accurate Armor Woven Silk 2 (flexible) Defense +5 Toughness 10 Pain Threshold 4 Equipment 10 Herbal cures Shadow Yellow and red as the autumn leaves, with faint streaks of rusty brown (corruption: 2*) Tactics: Autumn elves lead their siblings from a dis- tance, supporting allies with their mystical powers.";
-    // npcData = "Necromage Race Spirit Resistance Challenging Traits Alternative damage (III), Spirit form (III), Terrify (II) Accurate 10 (0), Cunning 9 (+1), Discreet 11 (−1), Persuasive 5 (+5), Quick 13 (−3), Resolute 15 (−5), Strong 7 (+3), Vigilant 10 (0) Abilities Mystical power (Bend will, adept) Weapons Wraith claws 5, ignores armor, Accurate damages Resolute Armor None, only mystical powers and magical weapons are harmful, only with half damage Defense −3 Toughness 10 Pain Threshold — Equipment None Shadow Dark gray, like thunderclouds in a cold night sky (thoroughly corrupt) Tactics: The necromage calls on its victims by bending their will, follows up by making them terrified and finishes them off with its claws when they are helpless.";
-    // npcData = "Primal Blight Beast Race Abomination Resistance Mighty Traits Acidic Blood (III), Armored (III), Corrupting Attack (III), Natural Weapon (III), Regeneration (III), Robust (III) Discreet 5 (+5), Quick 11 (−1), Cunning 9 (+1), Strong 18 (−8), Accurate 13 (−3), Vigilant 10 (0), Resolute 10 (0), Persuasive 7 (+3) Abilities Berserker (master), Exceptionally Strong (master), Iron Fist (master), Natural Warrior (master) Weapons Claws 20 (long), or two attacks Strong against the same target with damage 18 and 14, +1D8 in tem- porary corruption. Armor Blight Hardened Flesh 10, regen- erates 4 Toughness/turn Defense +3 Toughness 18 Pain Threshold 9 Shadow The deepest black, a light-con- suming stain on the midnight sky (thoroughly corrupt) Tactics: None. Its hatred towards all things living drives it to act without tactical concern – all that matters is destruction.";
-    // npcData = "Cryptwalker Race Spirit Resistance Strong Traits Gravely cold (III), Manifestation (III), Spirit form (III) Accurate 5 (+5), Cunning 10 (0), Discreet 7 (+3), Persuasive 10 (0), Quick 11 (−1), Resolute 13 (−3), Strong 15 (−5), Vigilant 9 (+1) Abilities Iron Fist (master), Twin Attack (master) Weapons 2 swords 7/6 (balanced), two Strong attacks against the same target Armor None, only mystical powers and magical weapons are harmful, only with half damage Defense −3 (two weapons) Toughness 15 Pain Threshold — Equipment Two wraith blades (quality: Balanced) Shadow Like a clear night sky, with faint light that does nothing but make the dark seem blacker (thoroughly corrupt) Tactics: The cryptwalker assumes that the ene- my will have a hard time damaging it, until proven otherwise. Either way it uses its gravely cold power to paralyze enemies, then finishes them off with the swords.";
-    // npcData = "Beamon Race Predator (beast) Resistance Challenging Traits Armored (II), Natural Weapon (II), Robust (II) Accurate 10 (0), Cunning 13 (−3), Discreet 7 (+3), Persuasive 5 (+5), Quick 10 (0), Resolute 9 (+1), Strong 15 (−5), Vigilant 11 (−1) Abilities Iron Fist (master), Natural Warrior (adept) Weapons Paws 12/7, two attacks at the Strong same target Armor Thick fur 6 Defense +3 Toughness 15 Pain Threshold 8 Shadow Brown bordering on black, like newly oiled hides (corruption: 0) Tactics: The Beamon relies on its strength and toughness, but is not stupid. If hopelessly outnumbered or facing stronger than expected resistance it will flee.";
     let expectedData = npcData.replace(/- /g,"");
 
     let namePattern = /^(.+?) (Race|Manner)/;
@@ -213,9 +206,16 @@ async function extractAllData(npcData)
 
     let updateObj = await actor.createOwnedItem(actorItems);
     // console.log("updateObj "+JSON.stringify(updateObj));
+
+
+    let healMe = {_id:actor._id};
+    setProperty(healMe, "data.health.toughness.value", getProperty(actor, "data.data.health.toughness.max") );
+    await Actor.update(healMe);
+
     let message = `Created ${actor.name}<br/>${additionalInfo}`;
     ChatMessage.create({
         speaker: ChatMessage.getSpeaker({alias: "NPC Importer Macro"}),
+        whisper: [game.user],
         content: message
     });
 
