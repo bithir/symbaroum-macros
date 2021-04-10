@@ -30,7 +30,8 @@ let allNames = {
 
     let dialog_content = `  
     <div class="form-group">
-      <label for="category">Select name generator</label>
+      <h1>Name generator</h1>
+      <label for="category">Select cultural being</label>
       <select id="category" name="category">${allKeys}
       </select>
     </div>`;
@@ -49,7 +50,7 @@ let allNames = {
     });
   
     x.options.width = 200;
-    x.position.width = 200;
+    x.position.width = 300;
   
     x.render(true);
   
