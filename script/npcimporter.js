@@ -44,8 +44,7 @@ async function extractSpecialItems(actorItems, type, abilitilist, abilityPattern
             if( tmpdata != null && tmpdata.length == 3)
             {
                 let higherLevel = false;
-                let ability = game.items.filter(element => element.name.trim().toLowerCase() === tmpdata[1].trim().toLowerCase() && element.type === type);
-                console.log("tmpdata[2]"+tmpdata[2]+":");
+                let ability = game.items.filter(element => element.name.trim().toLowerCase() === tmpdata[1].trim().toLowerCase() && element.type === type);                
                 if(ability.length > 0 )
                 {
                     // console.log("ability="+JSON.stringify(ability));
@@ -84,9 +83,9 @@ async function extractSpecialItems(actorItems, type, abilitilist, abilityPattern
                     console.log("Added ability "+ability.name)
                     actorItems.push(ability);
                 }
-                else 
+                else if( type !== "mysticalPower" && type !== "ability" )
                 {
-                    message += `${element} not added - add manually <br/>`;
+                    message += `${element} not added as ${type} - add manually if needed <br/>`;
                 }
             }
             else if( element.trim() !== "")
@@ -187,6 +186,7 @@ async function extractAllData(npcData)
     // Normal abilities
     // Medicus (master), 
     additionalInfo += await extractSpecialItems(actorItems, "ability", abilitilist, abilityPattern);
+    additionalInfo += await extractSpecialItems(actorItems, "mysticalPower", abilitilist, abilityPattern);
     // Mystical Power
     // let mysticalPowerPattern = /Mystical [Pp]ower \(([^,]+), ([^\)]*)\)/g;
     let singleMysticalPowerPattern = /Mystical [Pp]ower \(([^\)]*)\)/g;
