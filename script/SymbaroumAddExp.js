@@ -11,19 +11,18 @@
         // Time to get busy
         canvas.tokens.controlled.map(e => { 
             if(e.actor.data.type === "player") {
-                actorslist.push(e.actor);
+                if(game.user.isGM || e.actor.owner)
+                    actorslist.push(e.actor);
             }
         });
-        // check if there are tokens on the map, if so, use their actors
-        // if there are no controlled tokens on the map, select all players in the actor catalogue
+        if(actorslist.length > 0 ) 
+        {
+            actorslist = [actorslist[0]];
+        }
     } else {     
-        console.log(`Select from actors`);
-        let gameacts = game.actors.filter(e => { if(e.data.type === "player") { return e; } });
+        let gameacts = game.actors.filter(e => { if( (game.user.isGM || e.owner) && e.data.type === "player") { return e; } });
         Array.prototype.push.apply(actorslist, gameacts);
     }
-
-
-    console.log(actorslist);
 
     let allKeys = "";
     actorslist.forEach(t => {
