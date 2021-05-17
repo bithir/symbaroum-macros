@@ -76,6 +76,6 @@ async function rollAttribute(actorids, attribute)
 {
     let updates = actorids.map(a => {
         let aexp = game.actors.get(a);
-        actor.rollAttribute(attribute, null, null);
+        aexp.rollAttribute(attribute, null, null);
     });
 }
