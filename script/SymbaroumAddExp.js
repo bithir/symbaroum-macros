@@ -69,18 +69,24 @@
 
 function addExperience(actorids, exp)
 {
-    let actorNames = [];
+    let actorNames = "";
     let updates = actorids.map(a => {
         let aexp = game.actors.get(a);
     
-        actorNames.push(aexp.name);
+        actorNames = actorNames + "<li>" + aexp.name;
 
         return {
             _id: a,
             "data.experience.total": aexp.data.data.experience.total + exp
         };
     });
-    console.log(updates);
+    
     Actor.update(updates);
-    ui.notifications.info(`Added ${exp} experience to checked (${actorNames}) characters`);
+    let chatOptions = {
+        rollMode: game.settings.get('core', 'rollMode'),        
+        content: `<h2>Experience change</h2> 
+                    The following actors:<ul> ${actorNames}</ul> were awarded ${exp} experience`
+    };
+    ChatMessage.create(chatOptions);
+    // ui.notifications.info(`Added ${exp} experience to checked (${actorNames}) characters`);
 }

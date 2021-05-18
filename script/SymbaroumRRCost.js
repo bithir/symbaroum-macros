@@ -56,8 +56,8 @@
     </div>`;
     if(bithirsGame) {
         dialog_content = dialog_content + `<div style="flex-basis: auto;flex-direction: row;display: flex;">
-        <div style="width:10em;min-width:10em;"><label for="permanent">Corruption (temp)</label></div>
-        <div><input type="radio" id="temporary" value="temporary" name="costType"></div>
+        <div style="width:10em;min-width:10em;"><label for="permanent">Corruption (daily)</label></div>
+        <div><input type="radio" id="longterm" value="longterm" name="costType"></div>
         </div>`;
     }
     dialog_content += `<br /></div>`;
@@ -69,8 +69,6 @@
             Ok :{ label : `Ok`, callback : async (html) => {             
                                             let tmp = html.find("input[name='selection']").get().filter(v => { if(v.checked) return true; }).map(e => { return e.value});
                                             let costType = html.find("input[name='costType']").get().filter(v => { if(v.checked) return true; }).map(e => { return e.value});
-                                            console.log(tmp);
-                                            console.log(costType);
 
                                             await payCost(tmp,costType);
                                         }
@@ -87,37 +85,45 @@
 
 async function payCost(actorids, costType)
 {
+    let aexp = null;
     let actorName = "";
-    let dice = new Roll("1d4").roll();
+    
+    let message_content = "";
+    let dice = new Roll("1d4");
+    dice.roll();
 
     let updates = actorids.map(a => {
-        let aexp = game.actors.get(a);
-        actorName = aexp.name;
+        aexp = game.actors.get(a);
+        actorName = aexp.name;        
         return {
             _id: a,
             "data.experience.artifactrr": aexp.data.data.experience.artifactrr + ( costType.includes("artifactrr")? 1:0),
             "data.health.corruption.permanent": aexp.data.data.health.corruption.permanent + ( costType.includes("permanent")? 1:0),
-            "data.health.corruption.temporary": aexp.data.data.health.corruption.temporary + ( costType.includes("temporary")? dice.total:0)
+            "data.health.corruption.longterm": aexp.data.data.health.corruption.longterm + ( costType.includes("longterm")? dice.total:0)
         };
     });
     console.log(updates);
-    await Actor.update(updates);
+    let chatOptions = {
+        speaker: {
+			actor: aexp._id
+	    },
+        rollMode: game.settings.get("core", "rollMode")
+     };
+
     // 
-    if( costType.includes("temporary") ) {
+    if( costType.includes("longterm") ) {
         /** Only applicable for Bithir game */
-        let chatOptions = {
-            type: CHAT_MESSAGE_TYPES.ROLL,
-            roll: dice,
-            rollMode: game.settings.get("core", "rollMode"),
-            content: `<h2>Re-roll for temp corruption</h2> 
-                        Result was ${dice.total} temporary corruption`
-         };
-         ChatMessage.create(chatOptions);
-            
+        chatOptions["type"] = CHAT_MESSAGE_TYPES.ROLL;
+        chatOptions["content"] = `<h2>Re-roll for daily corruption</h2> 
+            ${actorName} paid ${dice.total} daily corruption for a re-roll`;        
+        chatOptions["roll"] = dice;
     } else {
-        ui.notifications.info(`You paid ${ costType.includes("artifactrr") ? "experience":"permanent corruption" } for a re-roll`);
+        chatOptions["content"] = `<h2>Re-roll for ${ costType.includes("artifactrr") ? "experience":"permanent corruption" }</h2>
+            ${actorName} paid 1 ${ costType.includes("artifactrr") ? "experience":"permanent corruption" } for a re-roll`
+        
     }
-     
+    ChatMessage.create(chatOptions);     
+    await Actor.update(updates);
     
     // Post results
 }
