@@ -10,11 +10,12 @@
 // OWNER - always displayed for a GM or for a user who owns the actor 
 // ALWAYS - always displayed for everyone
 let tokens =  canvas.tokens.controlled.map( token => {
-   return { _id: token._id,
+   return { _id: token.id,
          "bar2.attribute": "",
          "displayName": CONST.TOKEN_DISPLAY_MODES.ALWAYS,
          "displayBars": CONST.TOKEN_DISPLAY_MODES.ALWAYS
    }
 });
-if( tokens && tokens.length > 0)
-   canvas.tokens.updateMany(tokens);
+if( tokens && tokens.length > 0) {   
+   canvas.scene.updateEmbeddedDocuments("Token", tokens);
+}

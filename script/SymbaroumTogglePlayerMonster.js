@@ -2,7 +2,7 @@
 (()=>{
     let dialog_content = `  
     <div class="form-group">
-        Type the exact name of the NPC - ensure the NPC has a unique name among all your actors.  The named NPC will be made into a player.
+        Type the exact name of the player/npc - ensure the Player/NPC has a unique name among all your actors.  <br/> A NPC will be made into a player. A player will be made into an NPC.<br/>
       <label for="npctext">NPC name</label>
       <input name="npctext" type="text">
     </div>`;
@@ -25,20 +25,15 @@
 
 async function change2PC(npcname)
 {
-    let myNpcActor = game.actors.getName(npcname);
-    console.log(myNpcActor);
-    if( myNpcActor === null) {
+    let myActor = game.actors.getName(npcname);
+    console.log(myActor);
+    if( myActor === null) {
         ui.notifications.error(`Could not find actor with name ${npcname}. Try again`);
         return;
     }
     let update = { 
-        _id : myNpcActor._id,
-        type : "player"
+        type : myActor.type === "player" ? "monster":"player"
     };
-    if( myNpcActor.data.type !== "monster") {
-        ui.notifications.error(`Actor with name ${npcname} is not an NPC.`);
-        return;        
-    }
-    await myNpcActor.update(update);
-    ui.notifications.info(`Actor with name ${npcname} is now a PC.`);
+    await myActor.update(update);
+    ui.notifications.info(`Actor with name ${npcname} is now a ${update.type}.`);
 }

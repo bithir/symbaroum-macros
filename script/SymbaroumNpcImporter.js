@@ -204,13 +204,13 @@ async function extractAllData(npcData)
 
     // console.log("actorItems:"+JSON.stringify(actorItems));
 
-    let updateObj = await actor.createOwnedItem(actorItems);
+    let updateObj = await actor.createEmbeddedDocuments("Item", actorItems);
     // console.log("updateObj "+JSON.stringify(updateObj));
 
 
-    let healMe = {_id:actor._id};
+    let healMe = {_id:actor.id};
     setProperty(healMe, "data.health.toughness.value", getProperty(actor, "data.data.health.toughness.max") );
-    await Actor.update(healMe);
+    await Actor.updateDocuments([healMe]);
 
     let message = `Created ${actor.name}<br/>${additionalInfo}`;
     ChatMessage.create({
