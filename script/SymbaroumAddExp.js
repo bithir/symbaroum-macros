@@ -38,7 +38,7 @@
     ${allKeys}
     <br />
     <div style="flex-basis: auto;flex-direction: row;display: flex;">
-                <div style="width:10em;min-width:10em;"><label for="experience" style="width:10em;min-width:10em">Experience</label></div><div><input type="text" name="experience" style="width:5em"></div>
+                <div style="width:10em;min-width:10em;"><label for="experience" style="width:10em;min-width:10em">Experience</label></div><div><input type="text" name="experience" value="1" style="width:5em"></div>
     </div>
     <br/>
     </div>`;
