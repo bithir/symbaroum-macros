@@ -183,11 +183,8 @@ async function extractAllData(npcData)
         setProperty(newValues, "data.attributes.resolute.value", 10 - parseInt(myMatches[6]) );    
         setProperty(newValues, "data.attributes.strong.value", 10 - parseInt(myMatches[7]) );    
         setProperty(newValues, "data.attributes.vigilant.value", 10 - parseInt(myMatches[8]) );    
-        console.log("10 - parseInt(myMatches[2]) is "+ (10 - parseInt(myMatches[2])));
-        console.log(myMatches);
     } else {
         additionalInfo += "Could not find the attributes<br/>";
-
     }
     let shadowPattern = /Shadow (.*) \(/;
     // console.log("Shadow["+extractData(expectedData,shadowPattern)+"]");    
