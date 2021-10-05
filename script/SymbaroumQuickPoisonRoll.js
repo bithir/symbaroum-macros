@@ -8,12 +8,10 @@ if( targetTokens.length === 0)
 let playerAttr = "cunning";
 let targetAttr = "strong";
 
-let player = canvas.tokens.controlled[0].actor;
-let target = targetTokens[0].actor;
-
-console.log(player);
-console.log(target);
-
+let playerToken = canvas.tokens.controlled[0];
+let player = playerToken.actor;
+let targetToken = targetTokens[0];
+let target = targetToken.actor;
 
 let targetValue = player.data.data.attributes[playerAttr].total - (target.data.data.attributes[targetAttr].total - 10);
 
@@ -29,12 +27,12 @@ let chatOptions = {
 };
 
 if( attributeRoll.total > targetValue) {
-    chatOptions["content"] = `<h1>Poison fail</h1>${player.name} failed to poison ${target.name}`;
+    chatOptions["content"] = `<h1>Poison fail</h1><div style="min-height:60px; background-size:50px 60px; background-image:url(${playerToken.data.img}); background-repeat:no-repeat"></div>${player.name} failed to poison <div style="min-height:60px; background-size:50px 60px; background-image:url(${targetToken.data.img}); background-repeat:no-repeat"></div> ${target.name}`;
 } else {
     let poisonDice = new Roll("2d4");
     await poisonDice.roll();
 
-    chatOptions["content"]=`<h1>Poison success</h1>${player.name} successfully poisoned ${target.name} for ${poisonDice.total} turns`;
+    chatOptions["content"]=`<h1>Poison success</h1><div style="min-height:60px; background-size:50px 60px; background-image:url(${playerToken.data.img}); background-repeat:no-repeat"></div> ${player.name} successfully poisoned <div style="min-height:60px; background-size:50px 60px; background-image:url(${targetToken.data.img}); background-repeat:no-repeat"></div>${target.name} for ${poisonDice.total} turns`;
 }
 
 ChatMessage.create(chatOptions);
