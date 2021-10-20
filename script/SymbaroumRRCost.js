@@ -113,9 +113,9 @@ async function payCost(actorids, costType)
     // 
     if( costType.includes("longterm") ) {
         /** Only applicable for Bithir game */
-        chatOptions["type"] = CHAT_MESSAGE_TYPES.ROLL;
+        chatOptions["type"] = CONST.CHAT_MESSAGE_TYPES.ROLL;
         chatOptions["content"] = `<h2>Re-roll for daily corruption</h2> 
-            ${actorName} paid ${dice.total} daily corruption for a re-roll`;        
+            ${actorName} paid ${dice.total}  daily corruption for a re-roll`;        
         chatOptions["roll"] = dice;
     } else {
         chatOptions["content"] = `<h2>Re-roll for ${ costType.includes("artifactrr") ? "experience":"permanent corruption" }</h2>
