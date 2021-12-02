@@ -219,4 +219,5 @@ async function extractAllData(npcData)
         content: message
     });
 
+    actor.sheet.render(true);
 }
