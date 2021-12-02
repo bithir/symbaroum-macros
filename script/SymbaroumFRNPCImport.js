@@ -7,27 +7,39 @@
 
 (()=>{
     let dialog_content = `  
-    <div class="form-group">
-    <label for="npctext">Paste NPC json data</label>
-    <input name="npctext" type="text">
+    <div class="symbaroum dialog">
+        <div style="width:100%; text-align:center">
+            <h3><a href="https://symbaroum.fr/#!/search" target="_blank">Symbaroum.fr</a> Character Importer</h3>
+        </div>
+        <div class="advantage">
+            <label for="isplayer">Player</label>
+            <span class="lblfavour"><input type="checkbox" id="isplayer" name="isplayer"></span>
+        </div>
+        <div class="advantage">
+            <label for="npctext">Paste json data</label>
+            <input name="npctext" type="text">
+        </div>
     </div>`;
 
     let x = new Dialog({
         content : dialog_content,
         buttons : 
         {
-            Ok : { label : `Ok`, callback : async (html)=> await extractAllData(html.find('[name=npctext]')[0].value.replace(/[\r|\n]/g, ""))},
+            Ok : { label : `Ok`, 
+            callback : 
+            async (html)=> await extractAllData(html.find('[name=npctext]')[0].value.replace(/[\r|\n]/g, ""), html.find("#isplayer")[0].checked)},
             Cancel : {label : `Cancel`}
         }
     });
-    x.options.width = 200;
-    x.position.width = 200;
+    x.options.width = 400;
+    x.options.height = 400;
+    x.position.width = 400;
     x.render(true);
 })();
 
-async function extractAllData(json)
+async function extractAllData(json, player)
 {
-    // json = '{"nom":"Example for Bithir","agi":"15","forc":"13","pre":"11","vol":"10","vig":"10","dis":"9","ast":"7","per":"5","ini":"","typ":"Big Monster","def":"15","end":"13","sd":"7","sc":"5","cp":"0","deg":"Sword 1d8","arm":"Light Armor 1d4","notes":"Notes bout the character","tactics":"Attack first, think last","shadow":"Green with golden slashes","equipment":"My equipment","regles":"","lang":"en","epingles":["Acrobatics"],"epinglesn":["Bodyguard"],"epinglesa":["Berserker"],"epinglesm":["Iron fist"]}';
+    // {"nom":"Example for Bithir","agi":"15","forc":"13","pre":"11","vol":"10","vig":"10","dis":"9","ast":"7","per":"5","ini":"","typ":"Big Monster","def":"15","end":"13","sd":"7","sc":"5","cp":"0","deg":"Sword 1d8","arm":"Light Armor 1d4","notes":"Notes bout the character","tactics":"Attack first, think last","shadow":"Green with golden slashes","equipment":"My equipment","regles":"","lang":"en","epingles":["Acrobatics"],"epinglesn":["Bodyguard"],"epinglesa":["Berserker","Bodyguard"],"epinglesm":["Iron fist"]}
     let symbfrJSON = null;
     try {
         symbfrJSON = JSON.parse(json);
@@ -36,10 +48,10 @@ async function extractAllData(json)
         ui.notification.error(err);
         return;
     }
-    console.log(symbfrJSON);
+    console.log(symbfrJSON, player);
     let newValues = {
         name: symbfrJSON.nom,
-        type: "monster",
+        type: player ? "player": "monster",
         folder: null,
         sort: 12000,
         data: {},
@@ -70,13 +82,14 @@ async function extractAllData(json)
     console.log(actor);
     let additionalInfo = "";
     let items = [];
-    additionalInfo += addPowers(symbfrJSON.epingles, items, 3);
-    additionalInfo += addPowers(symbfrJSON.epinglesm, items, 3);
-    additionalInfo += addPowers(symbfrJSON.epinglesn, items, 1);
-    additionalInfo += addPowers(symbfrJSON.epinglesa, items, 2);
+    let itemIds = [];
+    additionalInfo += addPowers(symbfrJSON.epingles, items, 3, itemIds);
+    additionalInfo += addPowers(symbfrJSON.epinglesm, items, 3, itemIds);
+    additionalInfo += addPowers(symbfrJSON.epinglesa, items, 2, itemIds);
+    additionalInfo += addPowers(symbfrJSON.epinglesn, items, 1, itemIds);
     // additionalInfo += addItems(symbfrJSON.equipment); - Just text
-    additionalInfo += addItems(symbfrJSON.deg, items);
-    additionalInfo += addItems(symbfrJSON.arm, items);
+    additionalInfo += addItems(symbfrJSON.deg, items, itemIds);
+    additionalInfo += addItems(symbfrJSON.arm, items, itemIds);
 
     let updateObj = await actor.createEmbeddedDocuments("Item", items);
 
@@ -95,7 +108,7 @@ async function extractAllData(json)
     actor.sheet.render(true);
 }
 
-function addPowers(powernames, items, level) {
+function addPowers(powernames, items, level, exclusions) {
     let info = "";
     for(let i = 0; i < powernames.length; i++) {
         let powers = game.items.filter(element => element.name.trim().toLowerCase() === powernames[i].trim().toLowerCase() && element.data.isPower);
@@ -104,6 +117,9 @@ function addPowers(powernames, items, level) {
         }    
         for(let j = 0; j < powers.length; j++) {
             let power = duplicate(powers[j].data);
+            if( exclusions.includes(power._id) ) {
+                continue;
+            }
             console.log("Power",powers[j]);
             if(powers[j].data.hasLevels) {
                 if(level > 2)
@@ -112,13 +128,15 @@ function addPowers(powernames, items, level) {
                     setProperty(power, "data.adept.isActive",true);
                 setProperty(power, "data.novice.isActive",true);
             }
+            exclusions.push(power._id);
             items.push(power);
         }
     }
     return info;
 }
 
-function addItems(itemName, items) {
+function addItems(itemName, items, exclusions) {
+    // Exclusions ignored for now
     let info = "";
     itemName = itemName.replace(/([0-9]+d[0-9]+)/g,'').trim();
     if( itemName == "") {
