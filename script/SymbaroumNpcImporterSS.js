@@ -35,40 +35,56 @@ const extractData = function(inputData, inputPattern) {
 
 (()=>{
     let dialog_content = `  
-    <div class="form-group">
-      <label for="npctext">Paste NPC data</label>
-      <textarea style="width:10em" name="npctext" type="textarea" col=15></textarea>
+    <div class="symbaroum dialog">
+        <div style="width:100%; text-align:center">
+            <h3><a href="https://freeleaguepublishing.com/en/store/?product_id=7092044267669" target="_blank">Symbaroum Starter Set</a> Character Importer</h3>
+        </div>
+        <div class="advantage">
+            <label for="isplayer">Player</label>
+            <span class="lblfavour"><input type="checkbox" id="isplayer" name="isplayer"></span>
+        </div>
+        <div class="advantage">
+            <label for="npctext">Paste PDF data</label>
+            <textarea name="npctext" type="text" cols=30 rows=8></textarea>
+        </div>
     </div>`;
-  
+
     let x = new Dialog({
-      content : dialog_content,
-      buttons : 
-      {
-        Ok : { label : `Ok`, callback : async (html)=> await extractAllData(html.find('[name=npctext]')[0].value)},
-        Cancel : {label : `Cancel`}
-      }
+        content : dialog_content,
+        buttons : 
+        {
+            Ok : { label : `Ok`, callback : async (html)=> await extractAllData(html.find('[name=npctext]')[0].value, html.find("#isplayer")[0].checked)},
+            Cancel : {label : `Cancel`}
+        }
     });
-  
-    x.options.width = 200;
-    x.position.width = 200;
-  
+
+    x.options.width = 400;
+    x.position.width = 400;
+
     x.render(true);
-  
+
 })();
+
+async function extractWeapons(actorItems, type, weaponList)
+{
+    game.symbaroum.log(actorItems, type, weaponList);
+    if(weaponList !== null)
+    {
+
+    }
+}
 
 async function extractSpecialItems(actorItems, type, abilitilist, abilityPattern)
 {
     let message = "";
     if( abilitilist !== null) {
         await abilitilist.forEach(async element => { 
-            let tmpdata = element.trim().match(abilityPattern);
-            if(tmpdata !== null ) {
-                console.log("tmpdata = "+tmpdata);
-            }
+            let tmpdata = element.trim().match(abilityPattern);            
             if( tmpdata != null && tmpdata.length == 3)
             {
+                console.log("tmpdata = ",tmpdata);
                 let higherLevel = false;
-                let ability = game.items.filter(element => element.name.trim().toLowerCase() === tmpdata[1].trim().toLowerCase() && element.type === type);                
+                let ability = game.items.filter(element => element.name.trim().toLowerCase() === tmpdata[1].trim().toLowerCase() && element.type === type);
                 if(ability.length > 0 )
                 {
                     // console.log("ability="+JSON.stringify(ability));
@@ -124,7 +140,7 @@ async function extractSpecialItems(actorItems, type, abilitilist, abilityPattern
     return message;    
 }
 
-async function extractAllData(npcData)
+async function extractAllData(npcData, player)
 {
     let additionalInfo = "";
 
@@ -137,19 +153,20 @@ async function extractAllData(npcData)
 
     }
     expectedData = npcData.replace(/[\r|\n]/g, " ");
-    expectedData = expectedData.replace(/−/g, "-");
-    expectedData = expectedData.replace(/Integrated /g,""); 
-    expectedData = expectedData.replace(/Abilities /g,""); 
+    expectedData = expectedData.replace(/[–−]/g, "-");
+    expectedData = expectedData.replace(/Integrated -?/g,""); 
+    // expectedData = expectedData.replace(/Abilities /g,""); 
     // Hack
-    expectedData = expectedData.replace(/Traits [-]/g,"Traits "); 
-    expectedData = expectedData.replace(/( )?[-] /g,"");
+    expectedData = expectedData.replace(/Traits -?/g,""); 
+    expectedData = expectedData.replace(/Abilities -/g,"Abilities ");
+    // expectedData = expectedData.replace(/ ?[-]/g,"");
     
     console.log(expectedData);    
 
     let namePattern = /^(.+?) (Race|Manner|NLMARKER)/;
     let newValues = {
         name: extractData(expectedData,namePattern),
-        type: "monster",
+        type: player ? "player": "monster",
         folder: null,
         sort: 12000,
         data: {},
@@ -165,7 +182,7 @@ async function extractAllData(npcData)
     setProperty(newValues, "data.bio.race",extractData(expectedData,racePattern));
 
     let myMatches = [];
-    // console.log("My count other is "+countother(/ACC CUN DIS PER QUI RES STR VIG/g,expectedData));
+    console.log("My count other is "+countother(/ACC CUN DIS PER QUI RES STR VIG/g,expectedData));
     if( countother(/ACC CUN DIS PER QUI RES STR VIG/g,expectedData) == 1 ) {
         // do it this way
         myMatches = expectedData.match(/ACC CUN DIS PER QUI RES STR VIG ([-+]?[0-9]+) ([-+]?[0-9]+) ([-+]?[0-9]+) ([-+]?[0-9]+) ([-+]?[0-9]+) ([-+]?[0-9]+) ([-+]?[0-9]+) ([-+]?[0-9]+)/);
@@ -174,7 +191,8 @@ async function extractAllData(npcData)
         // do it the other way
         myMatches = expectedData.match(/ACC ([-+]?[0-9]+) CUN ([-+]?[0-9]+) DIS ([-+]?[0-9]+) PER ([-+]?[0-9]+) QUI ([-+]?[0-9]+) RES ([-+]?[0-9]+) STR ([-+]?[0-9]+) VIG ([-+]?[0-9]+)/);
     }
-    if(myMatches.length === 9 ) {
+    console.log(myMatches);
+    if(myMatches !== null && myMatches.length === 9 ) {
         setProperty(newValues, "data.attributes.accurate.value", 10 - parseInt(myMatches[1]) );
         setProperty(newValues, "data.attributes.cunning.value", 10 - parseInt(myMatches[2]) );    
         setProperty(newValues, "data.attributes.discreet.value", 10 - parseInt(myMatches[3]) );    
@@ -186,8 +204,8 @@ async function extractAllData(npcData)
     } else {
         additionalInfo += "Could not find the attributes<br/>";
     }
-    let shadowPattern = /Shadow (.*) \(/;
-    // console.log("Shadow["+extractData(expectedData,shadowPattern)+"]");    
+    let shadowPattern = /Shadow ([^\(]*)/;
+    console.log("Shadow["+extractData(expectedData,shadowPattern)+"]");    
     setProperty(newValues, "data.bio.shadow", extractData(expectedData,shadowPattern));
     
     // If nomatch == thouroughly corrupt
@@ -199,19 +217,19 @@ async function extractAllData(npcData)
     }
     
     let tacticsPattern = / Tactics: (.*)/;
-    // console.log("Tactics["+extractData(expectedData,tacticsPattern)+"]");
+    console.log("Tactics["+extractData(expectedData,tacticsPattern)+"]");
     setProperty(newValues, "data.bio.tactics", extractData(expectedData,tacticsPattern));
 
     let actor = await Actor.create(newValues);
 
-    let abilitiesPattern = /Traits (.*) Equipment /;
+    let abilitiesPattern = /Abilities(.*) [Shadow|Equipment]/;
     let singleAbilityPattern = /([^,^\)]+?\))?/g;
     let abilityPattern = / ?([^\(]+)\((.+)\)/;
     let allAbilities = extractData(expectedData,abilitiesPattern);
-    console.log("allAbilities:"+allAbilities);
+    // console.log("allAbilities:"+allAbilities);
     let abilitilist = allAbilities.match(singleAbilityPattern);
     let actorItems = [];
-    console.log("abilitylist:"+abilitilist);
+    // console.log("abilitylist:"+abilitilist);
 
     // Normal abilities
     // Medicus (master), 
@@ -220,6 +238,12 @@ async function extractAllData(npcData)
     additionalInfo += await extractSpecialItems(actorItems, "trait", abilitilist, abilityPattern);
 
     // console.log("actorItems:"+JSON.stringify(actorItems));
+    // Weapons
+    let weaponsPattern = /Weapons (.*) [Abilities|Traits]/;
+    let singelWeaponPattern = / ?([^0-9]*)[0-9]+/g;
+    let allWeapons = extractData(expectedData,weaponsPattern);
+    game.symbaroum.log("allWeapons", allWeapons)
+    additionalInfo += await extractWeapons(allWeapons, "weapon", abilitilist, singelWeaponPattern);
 
     let updateObj = await actor.createEmbeddedDocuments("Item", actorItems);
     // console.log("updateObj "+JSON.stringify(updateObj));
@@ -231,9 +255,9 @@ async function extractAllData(npcData)
 
     let message = `Created ${actor.name}<br/>${additionalInfo}`;
     ChatMessage.create({
-        speaker: ChatMessage.getSpeaker({alias: "NPC Importer Macro"}),
+        speaker: ChatMessage.getSpeaker({alias: "Character Importer Macro"}),
         whisper: [game.user],
         content: message
     });
-
+    actor.sheet.render(true);
 }

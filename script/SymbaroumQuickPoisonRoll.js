@@ -16,7 +16,7 @@ let target = targetToken.actor;
 let targetValue = player.data.data.attributes[playerAttr].total - (target.data.data.attributes[targetAttr].total - 10);
 
 let attributeRoll = new Roll("1d20");
-await attributeRoll.roll();
+await attributeRoll.evauluate({async:false});
 let chatOptions = {
     type: foundry.CONST.CHAT_MESSAGE_TYPES.ROLL,
     speaker: {
@@ -30,7 +30,7 @@ if( attributeRoll.total > targetValue) {
     chatOptions["content"] = `<h1>Poison fail</h1><div style="min-height:60px; background-size:50px 60px; background-image:url(${playerToken.data.img}); background-repeat:no-repeat"></div>${player.name} failed to poison <div style="min-height:60px; background-size:50px 60px; background-image:url(${targetToken.data.img}); background-repeat:no-repeat"></div> ${target.name}`;
 } else {
     let poisonDice = new Roll("2d4");
-    await poisonDice.roll();
+    poisonDice.evauluate({async:false});
 
     chatOptions["content"]=`<h1>Poison success</h1><div style="min-height:60px; background-size:50px 60px; background-image:url(${playerToken.data.img}); background-repeat:no-repeat"></div> ${player.name} successfully poisoned <div style="min-height:60px; background-size:50px 60px; background-image:url(${targetToken.data.img}); background-repeat:no-repeat"></div>${target.name} for ${poisonDice.total} turns`;
 }

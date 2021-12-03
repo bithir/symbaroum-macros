@@ -15,10 +15,6 @@
                     actorslist.push(e.actor);
             }
         });
-        if(actorslist.length > 0 ) 
-        {
-            actorslist = [actorslist[0]];
-        }
     } else {     
         let gameacts = game.actors.filter(e => { if( (game.user.isGM || e.owner) && e.data.type === "player") { return e; } });
         Array.prototype.push.apply(actorslist, gameacts);

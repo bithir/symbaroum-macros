@@ -90,7 +90,7 @@ async function payCost(actorids, costType)
     
     let message_content = "";
     let dice = new Roll("1d4");
-    dice.roll();
+    dice.evaluate({async:false});
 
     let updates = actorids.map(a => {
         aexp = game.actors.get(a);
@@ -104,11 +104,12 @@ async function payCost(actorids, costType)
     });
     console.log(updates);
     let chatOptions = {
-        speaker: {
+        speaker: 
+        {
 			actor: aexp._id
-	    },
+        },
         rollMode: game.settings.get("core", "rollMode")
-     };
+    };
 
     // 
     if( costType.includes("longterm") ) {

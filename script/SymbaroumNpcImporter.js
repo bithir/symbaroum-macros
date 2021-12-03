@@ -13,25 +13,34 @@
 
 (()=>{
     let dialog_content = `  
-    <div class="form-group">
-      <label for="npctext">Paste NPC data</label>
-      <input name="npctext" type="text">
+    <div class="symbaroum dialog">
+        <div style="width:100%; text-align:center">
+            <h3><a href="https://freeleaguepublishing.com/en/store/?product_id=7092032045205" target="_blank">Symbaroum Core Book</a> Character Importer</h3>
+        </div>
+        <div class="advantage">
+            <label for="isplayer">Player</label>
+            <span class="lblfavour"><input type="checkbox" id="isplayer" name="isplayer"></span>
+        </div>
+        <div class="advantage">
+            <label for="npctext">Paste PDF data</label>
+            <input name="npctext" type="text">
+        </div>
     </div>`;
-  
+
     let x = new Dialog({
-      content : dialog_content,
-      buttons : 
-      {
-        Ok : { label : `Ok`, callback : async (html)=> await extractAllData(html.find('[name=npctext]')[0].value.replace(/[\r|\n]/g, ""))},
-        Cancel : {label : `Cancel`}
-      }
+        content : dialog_content,
+        buttons : 
+        {
+            Ok : { label : `Ok`, callback : async (html)=> await extractAllData(html.find('[name=npctext]')[0].value.replace(/[\r|\n]/g, ""), html.find("#isplayer")[0].checked)},
+            Cancel : {label : `Cancel`}
+        }
     });
-  
-    x.options.width = 200;
-    x.position.width = 200;
-  
+
+    x.options.width = 400;
+    x.position.width = 400;
+
     x.render(true);
-  
+
 })();
 
 async function extractSpecialItems(actorItems, type, abilitilist, abilityPattern)
@@ -99,7 +108,7 @@ async function extractSpecialItems(actorItems, type, abilitilist, abilityPattern
     return message;    
 }
 
-async function extractAllData(npcData)
+async function extractAllData(npcData, player)
 {
     let additionalInfo = "";
 
@@ -116,7 +125,7 @@ async function extractAllData(npcData)
     let namePattern = /^(.+?) (Race|Manner)/;
     let newValues = {
         name: extractData(expectedData,namePattern),
-        type: "monster",
+        type: player ? "player": "monster",
         folder: null,
         sort: 12000,
         data: {},
@@ -214,7 +223,7 @@ async function extractAllData(npcData)
 
     let message = `Created ${actor.name}<br/>${additionalInfo}`;
     ChatMessage.create({
-        speaker: ChatMessage.getSpeaker({alias: "NPC Importer Macro"}),
+        speaker: ChatMessage.getSpeaker({alias: "Character Importer Macro"}),
         whisper: [game.user],
         content: message
     });
