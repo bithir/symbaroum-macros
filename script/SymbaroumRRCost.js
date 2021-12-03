@@ -102,7 +102,7 @@ async function payCost(actorids, costType)
             "data.health.corruption.longterm": aexp.data.data.health.corruption.longterm + ( costType.includes("longterm")? dice.total:0)
         };
     });
-    console.log(updates);
+    // console.log(updates);
     let chatOptions = {
         speaker: 
         {
@@ -124,7 +124,7 @@ async function payCost(actorids, costType)
         
     }
     ChatMessage.create(chatOptions);     
-    await Actor.update(updates);
+    await Actor.updateDocument(updates);
     
     // Post results
 }

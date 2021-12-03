@@ -77,7 +77,7 @@ function addExperience(actorids, exp)
         };
     });
     
-    Actor.update(updates);
+    Actor.updateDocuments(updates);
     let chatOptions = {
         rollMode: game.settings.get('core', 'rollMode'),        
         content: `<h2>Experience change</h2> 
