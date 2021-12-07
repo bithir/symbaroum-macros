@@ -1,7 +1,7 @@
 (()=>{
 let actorName = 'Bithir'; // Change here to 'actor name' for the actor name, if you want to hard code the actor
 let itemName = 'Normal Arrow'; // Change ehre to 'item name' for the item to increase/decrease
-let itemCount = -1; // change to number you want to increase (> 0) or decrease (negtive value)
+let itemCount = -1; // change to number you want to increase (> 0) or decrease (negative value)
 
 updateQuantity(actorName, itemName, itemCount);
 })();
@@ -13,12 +13,16 @@ async function updateQuantity(actorName, itemName, itemCount)
         return e;
     });
     if(item.length == 0) {
-        // Notify
-        return;
+        return ui.notifications.error(`Found no ${itemName} on ${actorName}`);
     }
     let itemUpdate = {_id: item[0].id};
-    setProperty(itemUpdate, "data.number", item[0].data.data.number + itemCount);
+    let finalCount = item[0].data.data.number + itemCount;
+    if( finalCount < 0) {
+        return ui.notifications.error(`Not enough ${itemName}`);
+    }
+    setProperty(itemUpdate, "data.number", finalCount );
     game.symbaroum.log(itemUpdate);
 
-    await actor.updateEmbeddedDocuments("Item", [itemUpdate] );    
+    item = await actor.updateEmbeddedDocuments("Item", [itemUpdate] );    
+    ui.notifications.info(`Reduced the number of ${itemName}. You now have ${finalCount}`);   
 }
