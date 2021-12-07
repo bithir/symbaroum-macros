@@ -21,7 +21,6 @@ async function updateQuantity(actorName, itemName, itemCount)
         return ui.notifications.error(`Not enough ${itemName}`);
     }
     setProperty(itemUpdate, "data.number", finalCount );
-    game.symbaroum.log(itemUpdate);
 
     item = await actor.updateEmbeddedDocuments("Item", [itemUpdate] );    
     ui.notifications.info(`Reduced the number of ${itemName}. You now have ${finalCount}`);   
