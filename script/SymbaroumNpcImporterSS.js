@@ -72,6 +72,7 @@ async function extractWeapons(actorItems, type, weaponList)
     {
 
     }
+    return "";
 }
 
 async function extractSpecialItems(actorItems, type, abilitilist, abilityPattern)
@@ -178,7 +179,7 @@ async function extractAllData(npcData, player)
     let mannerPattern = /resistance “(.*)”/;
     setProperty(newValues, "data.bio.manner",extractData(expectedData,mannerPattern));
 
-    let racePattern = /NLMARKER (.*), .* resistance/;
+    let racePattern = /NLMARKER (.*?), .* resistance/;
     setProperty(newValues, "data.bio.race",extractData(expectedData,racePattern));
 
     let myMatches = [];
@@ -222,7 +223,7 @@ async function extractAllData(npcData, player)
 
     let actor = await Actor.create(newValues);
 
-    let abilitiesPattern = /Abilities(.*) [Shadow|Equipment]/;
+    let abilitiesPattern = /Abilities(.+?) (Shadow|Equipment)/;
     let singleAbilityPattern = /([^,^\)]+?\))?/g;
     let abilityPattern = / ?([^\(]+)\((.+)\)/;
     let allAbilities = extractData(expectedData,abilitiesPattern);
@@ -239,7 +240,7 @@ async function extractAllData(npcData, player)
 
     // console.log("actorItems:"+JSON.stringify(actorItems));
     // Weapons
-    let weaponsPattern = /Weapons (.*) [Abilities|Traits]/;
+    let weaponsPattern = /Weapons (.+?) (Abilities|Traits)/;
     let singelWeaponPattern = / ?([^0-9]*)[0-9]+/g;
     let allWeapons = extractData(expectedData,weaponsPattern);
     game.symbaroum.log("allWeapons", allWeapons)

@@ -49,7 +49,7 @@ async function extractSpecialItems(actorItems, type, abilitilist, abilityPattern
     if( abilitilist !== null) {
         await abilitilist.forEach(async element => { 
             let tmpdata = element.trim().match(abilityPattern);
-            console.log("tmpdata = "+tmpdata);
+            // console.log("tmpdata = "+tmpdata);
             if( tmpdata != null && tmpdata.length == 3)
             {
                 let higherLevel = false;
@@ -183,7 +183,7 @@ async function extractAllData(npcData, player)
 
     let actor = await Actor.create(newValues);
 
-    let abilitiesPattern = /Abilities (.*) Weapons /;
+    let abilitiesPattern = /Abilities (.+?) Weapons /;
     let singleAbilityPattern = /([^,^\)]+?\))?/g;
     let abilityPattern = / ?([^\(]+)\((.+)\)/;
     let allAbilities = extractData(expectedData,abilitiesPattern);

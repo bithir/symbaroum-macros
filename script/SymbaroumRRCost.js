@@ -124,7 +124,7 @@ async function payCost(actorids, costType)
         
     }
     ChatMessage.create(chatOptions);     
-    await Actor.updateDocument(updates);
+    await Actor.updateDocuments(updates);
     
     // Post results
 }
