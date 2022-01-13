@@ -10,7 +10,7 @@
         // If no actor selected
         // Time to get busy
         canvas.tokens.controlled.map(e => { 
-            if(e.actor.data.type === "player") {
+            if(e.actor.data.type === "player" && e.hasPlayerOwner) {
                 if(game.user.isGM || e.actor.owner)
                     actorslist.push(e.actor);
             }
@@ -20,7 +20,7 @@
             actorslist = [actorslist[0]];
         }
     } else {     
-        let gameacts = game.actors.filter(e => { if( (game.user.isGM || e.owner) && e.data.type === "player") { return e; } });
+        let gameacts = game.actors.filter(e => { if( (game.user.isGM || e.owner) && e.data.type === "player" && e.hasPlayerOwner) { return e; } });
         Array.prototype.push.apply(actorslist, gameacts);
     }
 

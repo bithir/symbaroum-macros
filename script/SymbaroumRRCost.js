@@ -11,7 +11,7 @@
         // If no actor selected
         // Time to get busy
         canvas.tokens.controlled.map(e => { 
-            if(e.actor.data.type === "player") {
+            if(e.actor.data.type === "player" && e.hasPlayerOwner) {
                 if(game.user.isGM || e.actor.owner)
                     actorslist.push(e.actor);
             }
@@ -20,7 +20,7 @@
         // check if there are tokens on the map, if so, use their actors
         // if there are no controlled tokens on the map, select all players in the actor catalogue
     } else {     
-        let gameacts = game.actors.filter(e => { if( (game.user.isGM || e.owner) && e.data.type === "player") { return e; } });
+        let gameacts = game.actors.filter(e => { if( (game.user.isGM || e.owner) && e.data.type === "player" && e.hasPlayerOwner) { return e; } });
         Array.prototype.push.apply(actorslist, gameacts);
     }
     

@@ -16,7 +16,7 @@
             }
         });
     } else {     
-        let gameacts = game.actors.filter(e => { if( (game.user.isGM || e.owner) && e.data.type === "player") { return e; } });
+        let gameacts = game.actors.filter(e => { if( (game.user.isGM || e.owner) && e.data.type === "player" && e.hasPlayerOwner) { return e; } });
         Array.prototype.push.apply(actorslist, gameacts);
     }
 
