@@ -183,7 +183,7 @@ async function extractAllData(npcData, player)
 
     let actor = await Actor.create(newValues);
 
-    let abilitiesPattern = /Abilities (.+?) Weapons /;
+    let abilitiesPattern = /Abilities (.+?) Weapons,? /;
     let singleAbilityPattern = /([^,^\)]+?\))?/g;
     let abilityPattern = / ?([^\(]+)\((.+)\)/;
     let allAbilities = extractData(expectedData,abilitiesPattern);
