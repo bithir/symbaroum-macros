@@ -7,7 +7,7 @@
         // If no actor selected
         // Time to get busy
         canvas.tokens.controlled.map(e => { 
-            if(e.actor.data.type === "player" ) { // && e.hasPlayerOwner) {
+            if(e.actor.data.type === "player" && e.hasPlayerOwner) {
                 if(game.user.isGM || e.actor.owner)
                     actorslist.push(e.actor);
             }
