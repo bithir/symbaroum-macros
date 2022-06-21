@@ -35,7 +35,7 @@ actorslist.forEach(t => {
 
 let allConsumables = "";
 consumables.forEach(t => {
-    allConsumables = allConsumables.concat(`<label for="${t}">${t}</label> <input id='${t}' type="checkbox" name="consumable" value="${t}"><br />`);
+    allConsumables = allConsumables.concat(`<label for="${t}">${t}</label> <input id='${t}' type="checkbox" name="consumable" value="${t"><br`);
 });
 
 let dialog_content = `  
