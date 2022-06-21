@@ -7,14 +7,14 @@ if(canvas.tokens.controlled.length > 0) {
     // If no actor selected
     // Time to get busy
     canvas.tokens.controlled.map(e => { 
-            if(game.user.isGM || e.actor.owner) {
+            if(game.user.isGM || e.actor.isOwner) {
                     actorslist.push(e.actor);
             }
     });
     // check if there are tokens on the map, if so, use their actors
     // if there are no controlled tokens on the map, select all players in the actor catalogue
 } else {     
-    let gameacts = game.actors.filter(e => { if( (game.user.isGM || e.owner) && e.hasPlayerOwner ) { return e; } });
+    let gameacts = game.actors.filter(e => { if( (game.user.isGM || e.isOwner) && e.hasPlayerOwner ) { return e; } });
     Array.prototype.push.apply(actorslist, gameacts);
 }
 if(actorslist.length === 0) {
@@ -43,7 +43,7 @@ let dialog_content = `
 ${allActors}
 <br />
 <div style="flex-basis: auto;flex-direction: row;display: flex;">
-<div style="width:10em;min-width:10em;"><label for="attribute" style="min-width:10em">Consumable</label> </div>
+<div style="width:10em;min-width:10em;"><label for="attribute" style="min-width:10em">${game.i18n.localize("HEADER.CONSUMABLE")}</label> </div>
 <div style="width:10em;min-width:10em;">${allConsumables}</div>
 </div><br/>
 </div>`;
