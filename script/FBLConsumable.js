@@ -11,7 +11,6 @@ if(canvas.tokens.controlled.length > 0) {
                     actorslist.push(e.actor);
             }
     });
-    if(actorslist.length > 0 ) { actorslist = [actorslist[0]]; }
     // check if there are tokens on the map, if so, use their actors
     // if there are no controlled tokens on the map, select all players in the actor catalogue
 } else {     
